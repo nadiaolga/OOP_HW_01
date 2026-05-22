@@ -35,17 +35,16 @@ class Student:
 
     # Студент выставляет оценку лектору.
     def rate_lecture(self, lecturer, course, grade):
-        if isinstance(lecturer,
-                      Lecturer) and course in lecturer.courses_attached and course in self.courses_in_progress:
-            if isinstance(grade, int) and 0 <= grade <= 10:
-                if course in lecturer.grades:
-                    lecturer.grades[course] += [grade]
-                else:
-                    lecturer.grades[course] = [grade]
-            else:
-                return 'Оценка неправильная'
-        else:
-            return 'Ошибка'
+    if not isinstance(lecturer, Lecturer):
+        return 'Ошибка'
+
+    if course not in lecturer.courses_attached or course not in self.courses_in_progress:
+        return 'Ошибка'
+
+    if not isinstance(grade, int) or not 1 <= grade <= 10:
+        return 'Оценка неправильная'
+
+    lecturer.grades.setdefault(course, []).append(grade)
 
     def avg_grade(self):
         return get_avg_grade(self.grades)
@@ -70,15 +69,18 @@ class Student:
 
     # Сравнение студентов
     def __lt__(self, other):
-        if not isinstance(other, Student): return NotImplemented
+        if not isinstance(other, Student): 
+            return NotImplemented
         return self.avg_grade() < other.avg_grade()
 
     def __gt__(self, other):
-        if not isinstance(other, Student): return NotImplemented
+        if not isinstance(other, Student): 
+            return NotImplemented
         return self.avg_grade() > other.avg_grade()
 
     def __eq__(self, other):
-        if not isinstance(other, Student): return NotImplemented
+        if not isinstance(other, Student): 
+            return NotImplemented
         return self.avg_grade() == other.avg_grade()
 
 
@@ -110,15 +112,18 @@ class Lecturer(Mentor):
 
     # Сравнение лекторов
     def __lt__(self, other):
-        if not isinstance(other, Lecturer): return NotImplemented
+        if not isinstance(other, Lecturer): 
+            return NotImplemented
         return self.avg_grade() < other.avg_grade()
 
     def __gt__(self, other):
-        if not isinstance(other, Lecturer): return NotImplemented
+        if not isinstance(other, Lecturer): 
+            return NotImplemented
         return self.avg_grade() > other.avg_grade()
 
     def __eq__(self, other):
-        if not isinstance(other, Lecturer): return NotImplemented
+        if not isinstance(other, Lecturer): 
+            return NotImplemented
         return self.avg_grade() == other.avg_grade()
 
 # Дочерний класс Reviewer (эксперты, проверяющие домашние задания).
@@ -127,17 +132,17 @@ class Reviewer(Mentor):
         super().__init__(name, surname)
 
     def rate_hw(self, student, course, grade):
-        if isinstance(grade, int) and 0 <= grade <= 10:
-            if isinstance(student, Student) and course in self.courses_attached and course in student.courses_in_progress:
-                if course in student.grades:
-                    student.grades[course] += [grade]
-                else:
-                    student.grades[course] = [grade]
-            else:
-                return 'Ошибка'
-        else:
+        if not isinstance(student, Student):
+            return 'Ошибка'
+
+        if course not in self.courses_attached or course not in student.courses_in_progress:
+            return 'Ошибка'
+
+        if not isinstance(grade, int) or not 1 <= grade <= 10:
             return 'Оценка неправильная'
 
+        student.grades.setdefault(course, []).append(grade)
+    
     def __str__(self):
         return (
             f"Имя: {self.name}\n"
